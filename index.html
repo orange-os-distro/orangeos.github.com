@@ -1,0 +1,575 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>OrangeOS</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: left-aligned hero over a full-width "screen" gallery, then a keyboard strip, feature grid, hardware, updates flow, install steps. */
+:root{
+  --bg:#F5F6F8; --surface:#FFFFFF; --ink:#151821; --muted:#5B6271; --line:#E0E3E9;
+  --orange:#F26A1B; --orange-ink:#B5470A; --orange-soft:#FFE9DB; --leaf:#2E7A50;
+  --key:#FFFFFF; --key-edge:#CDD2DB;
+  --f-display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body:"Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1116; --surface:#171A21; --ink:#ECEEF3; --muted:#9AA1AF; --line:#272B35;
+  --orange:#FF7A2E; --orange-ink:#FF9B5E; --orange-soft:#3A2214; --leaf:#5DBB86;
+  --key:#20242D; --key-edge:#353A46; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1116; --surface:#171A21; --ink:#ECEEF3; --muted:#9AA1AF; --line:#272B35;
+  --orange:#FF7A2E; --orange-ink:#FF9B5E; --orange-soft:#3A2214; --leaf:#5DBB86;
+  --key:#20242D; --key-edge:#353A46; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6}
+.wrap{max-width:1160px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--orange);outline-offset:3px;border-radius:6px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.05}
+h2{font-size:clamp(1.9rem,4vw,2.9rem);font-weight:700;letter-spacing:-.02em}
+h3{font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
+p{margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--orange-ink)}
+.lede{color:var(--muted);font-size:1.12rem;max-width:62ch}
+section{padding-block:clamp(56px,9vw,104px)}
+.sec-head{display:grid;gap:14px;margin-bottom:40px;max-width:760px}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:22px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:800;font-size:1.25rem;text-decoration:none;letter-spacing:-.01em}
+.brand svg{width:30px;height:30px}
+.top nav{display:flex;gap:22px;font-size:.95rem;color:var(--muted)}
+.top nav a{text-decoration:none}
+.top nav a:hover{color:var(--ink)}
+
+/* hero */
+.hero{padding-block:clamp(28px,6vw,72px) 40px;display:grid;gap:28px}
+.hero h1{font-size:clamp(3rem,10vw,7.4rem);font-weight:800;letter-spacing:-.045em;line-height:.92}
+.hero h1 .o{color:var(--orange)}
+.hero h1 small{display:block;font-size:.3em;font-weight:500;letter-spacing:-.01em;color:var(--muted);margin-top:.5em}
+.hero-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:40px;align-items:end}
+.ctas{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:999px;font-weight:600;text-decoration:none;font-size:1rem;border:1.5px solid transparent;transition:transform .15s ease, background .15s ease}
+.btn svg{width:18px;height:18px;flex:none}
+.btn-primary{background:var(--orange);color:#1A0C02}
+.btn-primary:hover{transform:translateY(-1px);background:var(--orange-ink);color:#fff}
+.btn-ghost{border-color:var(--line);background:var(--surface)}
+.btn-ghost:hover{border-color:var(--ink)}
+.meta{font-family:var(--f-mono);font-size:.8rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 18px}
+.meta span::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--leaf);margin-right:8px;vertical-align:middle}
+
+/* gallery */
+.gallery{display:grid;gap:18px;padding-bottom:20px}
+.frame{background:linear-gradient(180deg,#2A2E37,#1B1E25);border-radius:22px;padding:clamp(8px,1.4vw,16px);box-shadow:0 30px 80px -30px rgba(20,24,33,.45)}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.tab{all:unset;cursor:pointer;display:grid;gap:4px;padding:14px 16px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);min-width:0}
+.tab b{font-family:var(--f-display);font-size:1rem}
+.tab span{font-size:.85rem;color:var(--muted);line-height:1.4}
+.tab[aria-selected="true"]{border-color:var(--orange);box-shadow:inset 0 0 0 1px var(--orange)}
+.tab:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+
+/* ===== OS renders (self-contained palette) ===== */
+.screen{aspect-ratio:16/10;max-width:100%;width:100%;container-type:inline-size;position:relative;overflow:hidden;border-radius:10px;background:#1d2a4a}
+.os{position:absolute;inset:0;font-size:1.22cqw;font-family:var(--f-body);color:#1b1e26;line-height:1.35}
+.wall{position:absolute;inset:0;background:
+  radial-gradient(circle at 80% 28%,#FFC27A 0,#FF8A3D 12%,rgba(255,122,46,.0) 34%),
+  radial-gradient(ellipse at 18% 100%,#1F7A5C 0,rgba(31,122,92,0) 46%),
+  linear-gradient(165deg,#18233F 0%,#33295A 48%,#B9502C 100%)}
+.wall::after{content:"";position:absolute;inset:0;background:repeating-radial-gradient(circle at 80% 28%,rgba(255,255,255,.05) 0 .15em,transparent .15em 2.6em)}
+.menubar{position:absolute;top:0;left:0;right:0;height:2em;display:flex;align-items:center;gap:1.4em;padding:0 1.1em;background:rgba(250,248,246,.78);backdrop-filter:blur(12px);font-size:.95em;z-index:5}
+.menubar svg.logo{width:1.25em;height:1.25em}
+.menubar b{font-weight:600}
+.menubar .r{margin-left:auto;display:flex;gap:1.1em;align-items:center}
+.menubar .r svg{width:1.15em;height:1.15em}
+.dock{position:absolute;bottom:.7em;left:50%;transform:translateX(-50%);display:flex;gap:.5em;padding:.5em;border-radius:1.3em;background:rgba(255,255,255,.28);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.35);z-index:6}
+.ico{width:3.3em;height:3.3em;border-radius:.85em;position:relative;display:grid;place-items:center;box-shadow:0 .2em .5em rgba(0,0,0,.2)}
+.ico svg{width:58%;height:58%}
+.ico.run::after{content:"";position:absolute;bottom:-.42em;width:.28em;height:.28em;border-radius:50%;background:rgba(255,255,255,.9)}
+.sep{width:1px;background:rgba(255,255,255,.4);margin:.2em .15em}
+.i-files{background:linear-gradient(160deg,#5AA9F0,#2C6FD1)}
+.i-web{background:linear-gradient(160deg,#FFB15C,#F26A1B)}
+.i-mail{background:linear-gradient(160deg,#7FD3A8,#2E8A5E)}
+.i-term{background:linear-gradient(160deg,#3B4150,#15181F)}
+.i-photo{background:linear-gradient(160deg,#F7D46B,#E9893A)}
+.i-music{background:linear-gradient(160deg,#F28AA8,#C9406A)}
+.i-set{background:linear-gradient(160deg,#B7BDC9,#6F7685)}
+.i-store{background:linear-gradient(160deg,#9C8CF2,#5B47C9)}
+.i-trash{background:linear-gradient(160deg,#E8EBF0,#AEB4BF)}
+
+.win{position:absolute;background:#FBFBFC;border-radius:.75em;box-shadow:0 1.6em 3.4em -.6em rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.12);overflow:hidden;display:flex;flex-direction:column}
+.tb{height:2.4em;flex:none;display:flex;align-items:center;gap:.45em;padding:0 .9em;background:#EEEFF2;border-bottom:1px solid #DCDEE3;font-size:.92em;color:#4a505c}
+.tb i{width:.85em;height:.85em;border-radius:50%;background:#C8CCD4;display:block}
+.tb i:first-child{background:#F26A1B}
+.tb .t{flex:1;text-align:center;font-weight:600;margin-right:3em}
+.files{display:grid;grid-template-columns:11em 1fr;flex:1;min-height:0}
+.side{background:#F1F2F5;border-right:1px solid #E0E2E7;padding:.8em .6em;font-size:.9em;display:grid;align-content:start;gap:.15em}
+.side small{font-size:.78em;color:#8a909b;font-weight:600;padding:.6em .5em .2em}
+.side div{padding:.28em .55em;border-radius:.4em;display:flex;gap:.5em;align-items:center}
+.side div::before{content:"";width:.8em;height:.65em;border-radius:.15em;background:#5AA9F0}
+.side .on{background:#FFE2CF;color:#9A3A06;font-weight:600}
+.side .on::before{background:#F26A1B}
+.grid{padding:1.2em;display:grid;grid-template-columns:repeat(5,1fr);gap:1.2em .8em;align-content:start;font-size:.85em;text-align:center}
+.fi{display:grid;justify-items:center;gap:.35em}
+.fi .f{width:4.2em;height:3.2em;border-radius:.35em;background:linear-gradient(180deg,#78B8F2,#4A93E0);position:relative}
+.fi .f::before{content:"";position:absolute;top:-.35em;left:0;width:1.7em;height:.6em;border-radius:.3em .3em 0 0;background:#78B8F2}
+.fi .d{width:3em;height:3.8em;border-radius:.3em;background:#fff;border:1px solid #D5D8DE;position:relative}
+.fi .d.img{background:linear-gradient(165deg,#33295A,#F26A1B)}
+.fi .d.pdf::after{content:"PDF";position:absolute;bottom:.4em;left:0;right:0;font-size:.7em;font-weight:700;color:#C9406A}
+.fi.sel .lbl{background:#F26A1B;color:#fff;border-radius:.35em;padding:0 .4em}
+.fi.sel .d{outline:.18em solid rgba(242,106,27,.45);outline-offset:.2em}
+.term{background:#14171E;color:#D7DBE3;font-family:var(--f-mono);font-size:.84em;padding:.9em 1em;flex:1;white-space:pre;line-height:1.55}
+.term .p{color:#FF9B5E}.term .g{color:#7FD3A8}.term .c{color:#8A919E}
+.win.dark .tb{background:#22262F;border-color:#2E333D;color:#AEB4C0}
+
+/* spaces */
+.dim{position:absolute;inset:0;background:rgba(10,12,20,.42);backdrop-filter:blur(3px)}
+.strip{position:absolute;top:3em;left:0;right:0;display:flex;justify-content:center;gap:1.4em;z-index:4}
+.thumb{width:12em;aspect-ratio:16/10;border-radius:.5em;overflow:hidden;position:relative;box-shadow:0 .5em 1.2em rgba(0,0,0,.4);border:.16em solid transparent}
+.thumb.on{border-color:#FF8A3D}
+.thumb .wall{transform:none}
+.thumb em{position:absolute;bottom:-1.6em;left:0;right:0;text-align:center;color:#fff;font-style:normal;font-size:.85em}
+.thumb .mini{position:absolute;background:#fff;border-radius:.2em;opacity:.92}
+.plus{width:4em;align-self:center;aspect-ratio:1;border-radius:50%;background:rgba(255,255,255,.18);display:grid;place-items:center;color:#fff;font-size:1.8em;font-weight:300}
+.cards{position:absolute;top:15.5em;left:6%;right:6%;bottom:6em;display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:2em;z-index:4;align-items:center}
+.card{display:grid;gap:.6em;justify-items:center}
+.card .win{position:relative;width:100%;height:13em}
+.card.hl .win{box-shadow:0 0 0 .22em #FF8A3D,0 1.6em 3em -.6em rgba(0,0,0,.6)}
+.card label{color:#fff;font-size:.95em;display:flex;align-items:center;gap:.5em}
+.card label .ico{width:1.8em;height:1.8em;border-radius:.5em;box-shadow:none}
+
+/* quick look */
+.ql{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:46%;background:rgba(250,250,252,.96);border-radius:.9em;box-shadow:0 2em 5em -.5em rgba(0,0,0,.65),0 0 0 1px rgba(0,0,0,.15);overflow:hidden;z-index:7}
+.ql header{display:flex;align-items:center;gap:.6em;padding:.6em .9em;font-size:.9em;border-bottom:1px solid #E1E3E8}
+.ql header b{flex:1}
+.ql header span{background:#EDEEF1;border-radius:.4em;padding:.2em .7em;font-size:.88em}
+.ql .pic{aspect-ratio:3/2;background:
+  linear-gradient(180deg,rgba(0,0,0,0) 62%,#16304F 62.3%,#1D4D73 74%,#E8C08A 74.5%,#D9A56A 100%),
+  radial-gradient(circle at 70% 56%,#FFE3A6 0,#FF9B4A 8%,rgba(255,155,74,0) 26%),
+  linear-gradient(180deg,#3B3A78 0%,#B2577A 42%,#FF9858 62%)}
+.ql footer{padding:.5em .9em;font-size:.82em;color:#6a707c;display:flex;justify-content:space-between}
+.hint{position:absolute;bottom:5.3em;left:50%;transform:translateX(-50%);z-index:8;background:rgba(20,23,30,.82);color:#fff;border-radius:2em;padding:.4em 1em;font-size:.9em;display:flex;gap:.6em;align-items:center}
+.kc{display:inline-block;border:1px solid rgba(255,255,255,.5);border-radius:.35em;padding:0 .5em;font-family:var(--f-mono);font-size:.9em}
+
+/* settings */
+.set{display:grid;grid-template-columns:13em 1fr;flex:1;min-height:0}
+.set .side div::before{border-radius:.25em;width:1em;height:1em;background:#9AA1AE}
+.set .side .on::before{background:#F26A1B}
+.pane{padding:1.3em 1.8em;display:grid;gap:1em;align-content:start;font-size:.95em}
+.pane h4{margin:0;font-family:var(--f-display);font-size:1.5em}
+.grp{background:#fff;border:1px solid #E3E5EA;border-radius:.7em}
+.row{display:flex;align-items:center;justify-content:space-between;gap:1em;padding:.7em 1em;border-top:1px solid #EEF0F3}
+.row:first-child{border-top:0}
+.row .s{color:#7a808b;font-size:.85em}
+.caps{display:flex;gap:.35em;align-items:center}
+.cap{min-width:2.2em;padding:.15em .5em;border-radius:.35em;border:1px solid #CDD1D9;border-bottom-width:.2em;background:#FAFAFB;font-family:var(--f-mono);font-size:.85em;text-align:center}
+.arrow{color:#9aa0aa}
+.sw{width:2.6em;height:1.5em;border-radius:1em;background:#F26A1B;position:relative;flex:none}
+.sw::after{content:"";position:absolute;top:.15em;right:.15em;width:1.2em;height:1.2em;border-radius:50%;background:#fff}
+.sw.off{background:#CBCFD6}.sw.off::after{right:auto;left:.15em}
+
+/* keyboard section */
+.kb-section{background:var(--surface);border-block:1px solid var(--line)}
+.keys{display:grid;grid-template-columns:1fr 1fr 1.25fr 3.2fr 1.25fr 1fr;gap:10px;margin-bottom:44px}
+.key{background:var(--key);border:1px solid var(--key-edge);border-bottom-width:4px;border-radius:12px;padding:12px 14px;min-height:96px;display:flex;flex-direction:column;justify-content:space-between;min-width:0}
+.key .g{font-size:1.5rem;line-height:1}
+.key small{font-size:.78rem;color:var(--muted);line-height:1.3}
+.key.hot{border-color:var(--orange);background:var(--orange-soft)}
+.key.hot small{color:var(--orange-ink)}
+.shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 48px}
+.sc{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+.sc kbd{font-family:var(--f-mono);font-size:.95rem;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:2px 8px;white-space:nowrap}
+
+/* features */
+.feats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px 40px}
+.feat{display:grid;gap:8px;align-content:start;padding-top:18px;border-top:2px solid var(--ink)}
+.feat p{color:var(--muted)}
+
+/* hardware */
+.hw{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:56px;align-items:start}
+.models{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.model{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:grid;gap:2px}
+.model span{font-family:var(--f-mono);font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.note{margin-top:18px;font-size:.92rem;color:var(--muted)}
+
+/* updates flow */
+.flow{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:18px;align-items:center}
+.repo{border:1.5px solid var(--line);border-radius:16px;padding:22px;background:var(--surface);display:grid;gap:10px}
+.repo code{font-family:var(--f-mono);font-size:.85rem;color:var(--orange-ink);overflow-wrap:anywhere}
+.repo ul{margin:0;padding-left:18px;color:var(--muted);font-size:.95rem}
+.repo.orange{border-color:var(--orange)}
+.mac{display:grid;justify-items:center;gap:8px;text-align:center;font-family:var(--f-mono);font-size:.82rem;color:var(--muted)}
+.mac .scr{width:120px;height:78px;border-radius:8px;border:3px solid var(--ink);background:linear-gradient(165deg,#18233F,#33295A 50%,#F26A1B)}
+.mac .base{width:150px;height:8px;border-radius:0 0 8px 8px;background:var(--ink);margin-top:-8px}
+.flow .arr{color:var(--orange);font-size:1.6rem;font-family:var(--f-mono)}
+.flow-wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:center}
+.stack{display:grid;gap:14px}
+
+/* install */
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;counter-reset:s}
+.step{display:grid;gap:8px;align-content:start}
+.step::before{counter-increment:s;content:counter(s);font-family:var(--f-display);font-weight:800;font-size:2.6rem;line-height:1;color:var(--orange)}
+.step p{color:var(--muted);font-size:.96rem}
+.step kbd{font-family:var(--f-mono);font-size:.85rem;border:1px solid var(--line);border-radius:5px;padding:0 6px;background:var(--surface);color:var(--ink)}
+
+/* promise + cta */
+.promise{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.checks li{display:grid;grid-template-columns:24px 1fr;gap:12px;align-items:start}
+.checks li::before{content:"";width:20px;height:20px;margin-top:3px;border-radius:50%;background:var(--orange-soft);box-shadow:inset 0 0 0 6px var(--orange)}
+.nongoals{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:26px;display:grid;gap:12px;align-content:start}
+.nongoals p{color:var(--muted);font-size:.96rem}
+.final{background:var(--ink);color:var(--bg);border-radius:28px;padding:clamp(28px,5vw,56px);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:center}
+.final h2{color:var(--bg)}
+.final p{color:color-mix(in srgb,var(--bg) 70%,var(--ink))}
+.final .btn-ghost{background:transparent;color:var(--bg);border-color:color-mix(in srgb,var(--bg) 35%,var(--ink))}
+footer.foot{padding-block:40px;color:var(--muted);font-size:.85rem;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;border-top:1px solid var(--line);margin-top:72px}
+
+@media (max-width:900px){
+  .hero-row,.hw,.promise,.final,.flow-wrap{grid-template-columns:minmax(0,1fr)}
+  .feats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .shortcuts{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:620px){
+  .top nav{display:none}
+  .feats,.steps,.models{grid-template-columns:minmax(0,1fr)}
+  .keys{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .keys .space{grid-column:1/-1;order:-1;min-height:64px}
+  .flow{grid-template-columns:minmax(0,1fr)}
+  .flow .arr{transform:rotate(90deg);justify-self:center}
+  .tab span{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="orange" viewBox="0 0 32 32">
+      <circle cx="16" cy="17" r="13" fill="#F26A1B"/>
+      <circle cx="16" cy="17" r="10" fill="#FFB15C"/>
+      <g stroke="#F26A1B" stroke-width="1.4" stroke-linecap="round">
+        <path d="M16 17V7.5M16 17l8.2-4.8M16 17l8.2 4.8M16 17v9.5M16 17l-8.2 4.8M16 17l-8.2-4.8"/>
+      </g>
+      <circle cx="16" cy="17" r="1.6" fill="#FFF3E6"/>
+      <path d="M17 4.2c2.4-2.6 5.7-2.8 7.6-2.2-.6 2.6-3.3 4.6-7.2 4.3z" fill="#2E7A50"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="wrap top">
+  <a class="brand" href="#top" aria-label="OrangeOS home"><svg><use href="#orange"/></svg>OrangeOS</a>
+  <nav aria-label="Sections">
+    <a href="#screens">Screens</a><a href="#keyboard">Keyboard</a><a href="#hardware">Hardware</a><a href="#updates">Updates</a><a href="#install">Install</a>
+  </nav>
+</header>
+
+<main id="top">
+  <div class="wrap hero">
+    <p class="eyebrow">Version 1.0 · Codename Valencia</p>
+    <div class="hero-row">
+      <h1><span class="o">Orange</span>OS<small>A new life for the Intel Mac macOS left behind.</small></h1>
+      <div style="display:grid;gap:22px">
+        <p class="lede">A Debian 13 desktop built for Intel Macs from 2012 to 2017. The keyboard, trackpad, shortcuts, Dock and menu bar work the way your hands already expect. Security updates come straight from Debian.</p>
+        <div class="ctas">
+          <a class="btn btn-primary" href="https://github.com/orangeos/orangeos/releases/latest" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 20h16"/></svg>Download ISO</a>
+          <a class="btn btn-ghost" href="https://github.com/orangeos/orangeos" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="5" r="2.2"/><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="8" r="2.2"/><path d="M6 7.2v9.6M18 10.2c0 4-6 3.3-11 6.8"/></svg>View on GitHub</a>
+        </div>
+        <div class="meta"><span>Debian 13 Trixie base</span><span>amd64 live ISO</span><span>Open source</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Screens ===== -->
+  <section id="screens" class="wrap gallery" style="padding-top:20px" aria-label="OrangeOS screenshots">
+    <div class="frame">
+      <!-- 1. Desktop -->
+      <div class="screen" id="shot-desktop" role="tabpanel" aria-labelledby="t-desktop">
+        <div class="os">
+          <div class="wall"></div>
+          <div class="menubar"><svg class="logo"><use href="#orange"/></svg><b>Files</b><span>File</span><span>Edit</span><span>View</span><span>Go</span><span>Window</span><span>Help</span>
+            <div class="r"><svg viewBox="0 0 24 24" fill="none" stroke="#1b1e26" stroke-width="2"><path d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1" fill="#1b1e26"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="#1b1e26" stroke-width="2"><rect x="2" y="7" width="18" height="10" rx="2"/><rect x="4" y="9" width="11" height="6" fill="#1b1e26" stroke="none"/><path d="M22 11v2"/></svg><span>Thu 22 Oct</span><b>10:41</b></div></div>
+          <div class="win dark" style="left:44%;top:9%;width:50%;height:44%">
+            <div class="tb"><i></i><i></i><i></i><span class="t">orange@valencia: ~</span></div>
+            <div class="term"><span class="p">orange@valencia</span>:~$ sudo apt update
+<span class="c">Hit:1 http://deb.debian.org/debian trixie InRelease</span>
+<span class="c">Hit:2 http://security.debian.org/debian-security trixie-security InRelease</span>
+<span class="c">Hit:3 https://repo.orangeos.org valencia InRelease</span>
+<span class="g">All packages are up to date.</span>
+<span class="p">orange@valencia</span>:~$ grep PRETTY /etc/os-release
+PRETTY_NAME="OrangeOS 1.0 (Valencia)"
+<span class="p">orange@valencia</span>:~$ <span style="background:#D7DBE3">&nbsp;</span></div>
+          </div>
+          <div class="win" style="left:5%;top:20%;width:56%;height:58%">
+            <div class="tb"><i></i><i></i><i></i><span class="t">Documents</span></div>
+            <div class="files">
+              <div class="side"><small>Favourites</small><div>Home</div><div class="on">Documents</div><div>Downloads</div><div>Pictures</div><div>Music</div><small>Devices</small><div>Internal Disk</div><div>ORANGE_LIVE</div></div>
+              <div class="grid">
+                <div class="fi"><div class="f"></div><span class="lbl">Projects</span></div>
+                <div class="fi"><div class="f"></div><span class="lbl">Invoices</span></div>
+                <div class="fi"><div class="f"></div><span class="lbl">Travel</span></div>
+                <div class="fi"><div class="d pdf"></div><span class="lbl">lease.pdf</span></div>
+                <div class="fi"><div class="d img"></div><span class="lbl">dusk.jpg</span></div>
+                <div class="fi"><div class="d"></div><span class="lbl">notes.txt</span></div>
+                <div class="fi"><div class="d pdf"></div><span class="lbl">manual.pdf</span></div>
+                <div class="fi"><div class="f"></div><span class="lbl">Archive</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="dock">
+            <div class="ico i-files run"><svg viewBox="0 0 24 24" fill="#fff"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+            <div class="ico i-web run"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg></div>
+            <div class="ico i-mail"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div>
+            <div class="ico i-photo"><svg viewBox="0 0 24 24" fill="#fff"><circle cx="12" cy="12" r="4"/><circle cx="12" cy="4.5" r="2.2"/><circle cx="12" cy="19.5" r="2.2"/><circle cx="4.5" cy="12" r="2.2"/><circle cx="19.5" cy="12" r="2.2"/></svg></div>
+            <div class="ico i-music"><svg viewBox="0 0 24 24" fill="#fff"><path d="M9 17V6l11-2v11" stroke="#fff" stroke-width="2" fill="none"/><circle cx="7" cy="17" r="2.5"/><circle cx="18" cy="15" r="2.5"/></svg></div>
+            <div class="ico i-term run"><svg viewBox="0 0 24 24" fill="none" stroke="#FF9B5E" stroke-width="2.2"><path d="M5 8l4 4-4 4M12 16h7"/></svg></div>
+            <div class="ico i-store"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"/></svg></div>
+            <div class="ico i-set"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg></div>
+            <span class="sep"></span>
+            <div class="ico i-trash"><svg viewBox="0 0 24 24" fill="none" stroke="#5b6270" stroke-width="2"><path d="M5 7h14l-1.2 13H6.2zM9 7V4h6v3M3 7h18"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Spaces -->
+      <div class="screen" id="shot-spaces" role="tabpanel" aria-labelledby="t-spaces" hidden>
+        <div class="os">
+          <div class="wall"></div><div class="dim"></div>
+          <div class="strip">
+            <div class="thumb on"><div class="wall"></div><div class="mini" style="left:10%;top:22%;width:50%;height:50%"></div><div class="mini" style="left:45%;top:12%;width:45%;height:40%;background:#22262F"></div><em>Desktop 1</em></div>
+            <div class="thumb"><div class="wall"></div><div class="mini" style="left:15%;top:15%;width:70%;height:65%"></div><em>Desktop 2</em></div>
+            <div class="thumb"><div class="wall"></div><div class="mini" style="left:0;top:0;width:100%;height:100%;background:#F7F7F9"></div><em>Photos</em></div>
+            <div class="plus">+</div>
+          </div>
+          <div class="cards">
+            <div class="card hl"><div class="win"><div class="tb"><i></i><i></i><i></i><span class="t">Documents</span></div><div class="grid" style="grid-template-columns:repeat(4,1fr)"><div class="fi"><div class="f"></div></div><div class="fi"><div class="f"></div></div><div class="fi"><div class="d pdf"></div></div><div class="fi"><div class="d img"></div></div><div class="fi"><div class="d"></div></div><div class="fi"><div class="f"></div></div></div></div><label><span class="ico i-files"></span>Files</label></div>
+            <div class="card"><div class="win dark"><div class="tb"><i></i><i></i><i></i><span class="t">~</span></div><div class="term" style="font-size:.7em"><span class="p">orange@valencia</span>:~$ uptime
+ 10:41  up 3 days,  2 users</div></div><label><span class="ico i-term"></span>Terminal</label></div>
+            <div class="card"><div class="win"><div class="tb"><i></i><i></i><i></i><span class="t">Inbox</span></div><div style="padding:.8em;display:grid;gap:.5em"><div style="height:.7em;background:#E6E8EC;border-radius:.3em"></div><div style="height:.7em;width:80%;background:#E6E8EC;border-radius:.3em"></div><div style="height:.7em;width:90%;background:#FFE2CF;border-radius:.3em"></div><div style="height:.7em;width:70%;background:#E6E8EC;border-radius:.3em"></div><div style="height:.7em;width:85%;background:#E6E8EC;border-radius:.3em"></div></div></div><label><span class="ico i-mail"></span>Mail</label></div>
+          </div>
+          <div class="hint">Three-finger swipe up, or <span class="kc">⌃ ↑</span></div>
+        </div>
+      </div>
+
+      <!-- 3. Quick Look -->
+      <div class="screen" id="shot-ql" role="tabpanel" aria-labelledby="t-ql" hidden>
+        <div class="os">
+          <div class="wall"></div>
+          <div class="menubar"><svg class="logo"><use href="#orange"/></svg><b>Files</b><span>File</span><span>Edit</span><span>View</span><span>Go</span><span>Window</span><span>Help</span><div class="r"><span>Thu 22 Oct</span><b>10:43</b></div></div>
+          <div class="win" style="left:8%;top:10%;width:70%;height:70%;filter:saturate(.85)">
+            <div class="tb"><i></i><i></i><i></i><span class="t">Pictures</span></div>
+            <div class="files">
+              <div class="side"><small>Favourites</small><div>Home</div><div>Documents</div><div>Downloads</div><div class="on">Pictures</div><div>Music</div></div>
+              <div class="grid">
+                <div class="fi"><div class="d img"></div><span class="lbl">harbour.jpg</span></div>
+                <div class="fi sel"><div class="d img" style="background:linear-gradient(180deg,#3B3A78,#FF9858 60%,#1D4D73 62%)"></div><span class="lbl">valencia-coast.jpg</span></div>
+                <div class="fi"><div class="d img"></div><span class="lbl">market.jpg</span></div>
+                <div class="fi"><div class="d img"></div><span class="lbl">tiles.jpg</span></div>
+                <div class="fi"><div class="d img"></div><span class="lbl">rooftop.jpg</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="ql">
+            <header><b>valencia-coast.jpg</b><span>Open with Image Viewer</span></header>
+            <div class="pic"></div>
+            <footer><span>4032 × 2688 · 3.1 MB</span><span>Taken 14 Sep 2026</span></footer>
+          </div>
+          <div class="hint">Press <span class="kc">Space</span> to preview, again to close</div>
+          <div class="dock">
+            <div class="ico i-files run"><svg viewBox="0 0 24 24" fill="#fff"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+            <div class="ico i-web"></div><div class="ico i-mail"></div><div class="ico i-photo"></div><div class="ico i-term"></div><div class="ico i-set"></div><span class="sep"></span><div class="ico i-trash"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Settings -->
+      <div class="screen" id="shot-set" role="tabpanel" aria-labelledby="t-set" hidden>
+        <div class="os">
+          <div class="wall"></div>
+          <div class="menubar"><svg class="logo"><use href="#orange"/></svg><b>System Settings</b><span>Edit</span><span>View</span><span>Window</span><span>Help</span><div class="r"><span>Thu 22 Oct</span><b>10:45</b></div></div>
+          <div class="win" style="left:12%;top:8%;width:76%;height:76%">
+            <div class="tb"><i></i><i></i><i></i><span class="t">Keyboard</span></div>
+            <div class="set">
+              <div class="side"><small>Network</small><div>Wi-Fi</div><div>Bluetooth</div><small>Hardware</small><div>Displays</div><div class="on">Keyboard</div><div>Trackpad</div><div>Mouse</div><div>Sound</div><small>Desktop</small><div>Dock &amp; Menu Bar</div><div>Spaces</div><div>Software Updates</div></div>
+              <div class="pane">
+                <h4>Keyboard</h4>
+                <div class="grp">
+                  <div class="row"><span>Layout</span><span class="s">Apple · Spanish (ISO)</span></div>
+                  <div class="row"><span>Command key</span><span class="caps"><span class="cap">⌘</span><span class="arrow">→</span><span class="s">copy, paste, quit, switch apps</span></span></div>
+                  <div class="row"><span>Option key</span><span class="caps"><span class="cap">⌥</span><span class="arrow">→</span><span class="s">accents and word navigation</span></span></div>
+                  <div class="row"><span>Control key</span><span class="caps"><span class="cap">⌃</span><span class="arrow">→</span><span class="s">Spaces and terminal control</span></span></div>
+                </div>
+                <div class="grp">
+                  <div class="row"><span>Use F1, F2, etc. as standard function keys</span><span class="sw off"></span></div>
+                  <div class="row"><span>Adjust keyboard brightness in low light</span><span class="sw"></span></div>
+                  <div class="row"><span>Press <span class="cap">fn</span> to show emoji and symbols</span><span class="sw"></span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Choose a screenshot">
+      <button class="tab" role="tab" id="t-desktop" aria-controls="shot-desktop" aria-selected="true"><b>Desktop</b><span>Menu bar, Dock and the Files app</span></button>
+      <button class="tab" role="tab" id="t-spaces" aria-controls="shot-spaces" aria-selected="false" tabindex="-1"><b>Spaces</b><span>Every window and desktop at a glance</span></button>
+      <button class="tab" role="tab" id="t-ql" aria-controls="shot-ql" aria-selected="false" tabindex="-1"><b>Quick Look</b><span>Tap Space to preview any file</span></button>
+      <button class="tab" role="tab" id="t-set" aria-controls="shot-set" aria-selected="false" tabindex="-1"><b>Settings</b><span>Apple keyboards, set up by default</span></button>
+    </div>
+  </section>
+
+  <!-- ===== Keyboard ===== -->
+  <section id="keyboard" class="kb-section">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Mac interaction compatibility</p>
+        <h2>Your muscle memory still works.</h2>
+        <p class="lede">OrangeOS reads an Apple keyboard the way it was printed. Command does what Command does, and the shortcuts you have used for a decade land where you expect.</p>
+      </div>
+      <div class="keys" aria-label="Bottom row of an Apple keyboard">
+        <div class="key"><span class="g">⌃</span><small>control<br>Spaces, terminal</small></div>
+        <div class="key"><span class="g">⌥</span><small>option<br>accents, words</small></div>
+        <div class="key hot"><span class="g">⌘</span><small>command<br>app shortcuts</small></div>
+        <div class="key space"><span class="g">&nbsp;</span><small>space · Quick Look in Files</small></div>
+        <div class="key hot"><span class="g">⌘</span><small>command</small></div>
+        <div class="key"><span class="g">⌥</span><small>option</small></div>
+      </div>
+      <div class="shortcuts">
+        <div class="sc"><span>Copy, cut, paste</span><kbd>⌘C ⌘X ⌘V</kbd></div>
+        <div class="sc"><span>Switch between apps</span><kbd>⌘ Tab</kbd></div>
+        <div class="sc"><span>Cycle windows of the same app</span><kbd>⌘ `</kbd></div>
+        <div class="sc"><span>Quit the app, not the window</span><kbd>⌘Q</kbd></div>
+        <div class="sc"><span>Search apps and files</span><kbd>⌘ Space</kbd></div>
+        <div class="sc"><span>Show all Spaces</span><kbd>⌃ ↑</kbd></div>
+        <div class="sc"><span>Capture part of the screen</span><kbd>⇧⌘4</kbd></div>
+        <div class="sc"><span>Preview the selected file</span><kbd>Space</kbd></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Features ===== -->
+  <section class="wrap" aria-labelledby="feat-h">
+    <div class="sec-head">
+      <p class="eyebrow">What comes with 1.0</p>
+      <h2 id="feat-h">A Mac way of working, on a Debian foundation.</h2>
+    </div>
+    <div class="feats">
+      <div class="feat"><h3>Trackpad and Magic Mouse</h3><p>Tap to click, two-finger scroll with natural direction, and secondary click set up on first boot.</p></div>
+      <div class="feat"><h3>Gestures</h3><p>Swipe between Spaces with three fingers, pinch to zoom, and swipe up to see every open window.</p></div>
+      <div class="feat"><h3>Apps, not windows</h3><p>⌘ Tab switches between applications. Closing the last window leaves the app running, the way you are used to.</p></div>
+      <div class="feat"><h3>Dock and menu bar</h3><p>App menus live in the bar at the top. Running apps sit in the Dock with a dot underneath.</p></div>
+      <div class="feat"><h3>Quick Look</h3><p>Select a photo, PDF or text file and press Space to see it without opening anything.</p></div>
+      <div class="feat"><h3>Familiar settings</h3><p>Keyboard, Trackpad, Displays, Dock and Spaces are where you would look for them, with the same names.</p></div>
+    </div>
+  </section>
+
+  <!-- ===== Hardware ===== -->
+  <section id="hardware" class="wrap hw">
+    <div class="sec-head" style="margin:0">
+      <p class="eyebrow">Hardware</p>
+      <h2>Built for Intel Macs from 2012 to 2017.</h2>
+      <p class="lede">These are the machines Apple stopped updating but still have years left in them. Wi-Fi, input, audio and display have to work out of the box on every supported model.</p>
+    </div>
+    <div>
+      <div class="models">
+        <div class="model"><b>MacBook Air</b><span>2012 – 2017</span></div>
+        <div class="model"><b>MacBook Pro</b><span>2012 – 2017</span></div>
+        <div class="model"><b>MacBook</b><span>2015 – 2017</span></div>
+        <div class="model"><b>iMac</b><span>2012 – 2017</span></div>
+        <div class="model"><b>Mac mini</b><span>2012 – 2014</span></div>
+        <div class="model"><b>Mac Pro</b><span>2013</span></div>
+      </div>
+      <p class="note">This is the target range for 1.0. A model is listed as supported only after it passes the Orange Mac Experience certification suite, and newer Intel Macs are added the same way.</p>
+    </div>
+  </section>
+
+  <!-- ===== Updates ===== -->
+  <section id="updates" class="kb-section">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Updates</p>
+        <h2>Debian security updates, straight from Debian.</h2>
+        <p class="lede">OrangeOS does not repackage Debian. Your Mac talks to Debian's own servers for everything Debian ships, and to the Orange repository only for the pieces that make it feel like a Mac. Full upgrades keep the Orange packages in place.</p>
+      </div>
+      <div class="flow-wrap">
+        <div class="stack">
+          <div class="repo"><h3>Debian repositories</h3><code>deb.debian.org · security.debian.org</code><ul><li>The whole Debian 13 archive</li><li>Kernel and security fixes on Debian's schedule</li></ul></div>
+          <div class="repo orange"><h3>Orange repository</h3><code>valencia</code><ul><li>Orange desktop components and settings</li><li>A small, scoped set of compatibility overrides</li></ul></div>
+        </div>
+        <div class="flow" style="grid-template-columns:auto auto"><span class="arr">→</span><div class="mac"><div class="scr"></div><div class="base"></div>your Mac</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Install ===== -->
+  <section id="install" class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Install</p>
+      <h2>No Linux knowledge needed.</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Download the ISO</h3><p>Get the amd64 live image from the latest release on GitHub.</p></div>
+      <div class="step"><h3>Write it to USB</h3><p>Use any USB stick of 8 GB or more and a disk-imaging tool.</p></div>
+      <div class="step"><h3>Boot from it</h3><p>Hold <kbd>⌥</kbd> while the Mac starts and pick the EFI Boot drive.</p></div>
+      <div class="step"><h3>Try, then install</h3><p>The live session runs first. When everything works, click Install.</p></div>
+    </div>
+  </section>
+
+  <!-- ===== Promise ===== -->
+  <section class="wrap promise" style="padding-top:0">
+    <div class="sec-head" style="margin:0">
+      <p class="eyebrow">The 1.0 promise</p>
+      <h2>On a supported Mac, OrangeOS will:</h2>
+      <ul class="checks" style="margin-top:12px">
+        <li>Boot the live ISO</li>
+        <li>Install without manual Linux steps</li>
+        <li>Bring up networking, keyboard, trackpad, audio and display</li>
+        <li>Receive Debian security updates</li>
+        <li>Keep Orange packages through full upgrades</li>
+        <li>Pass the Orange Mac Experience certification suite</li>
+      </ul>
+    </div>
+    <div class="nongoals">
+      <h3>What OrangeOS is not</h3>
+      <p>OrangeOS copies behaviour, not code. It does not include macOS binaries, Apple artwork, or firmware it has no right to redistribute.</p>
+      <p>Apple services such as iMessage, FaceTime and Apple Pay are not supported and are not planned.</p>
+      <p>All branding is original, and every component is open source.</p>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="final">
+      <div style="display:grid;gap:10px"><h2>Give your Mac another decade.</h2><p>OrangeOS 1.0 Valencia · Debian 13 · amd64</p></div>
+      <div class="ctas">
+        <a class="btn btn-primary" href="https://github.com/orangeos/orangeos/releases/latest" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 20h16"/></svg>Download ISO</a>
+        <a class="btn btn-ghost" href="https://github.com/orangeos/orangeos" target="_blank" rel="noopener">View on GitHub</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="wrap"><div class="foot"><span>OrangeOS is an independent open-source project, not affiliated with Apple Inc. or the Debian Project.</span><span>Mac, MacBook and iMac are trademarks of Apple Inc.</span></div></footer>
+
+<script>
+(function(){
+  const tabs=[...document.querySelectorAll('.tab')];
+  function select(t,focus){
+    tabs.forEach(x=>{const on=x===t;x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1;document.getElementById(x.getAttribute('aria-controls')).hidden=!on});
+    if(focus)t.focus();
+  }
+  tabs.forEach((t,i)=>{
+    t.addEventListener('click',()=>select(t));
+    t.addEventListener('keydown',e=>{
+      if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();const n=tabs[(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length];select(n,true)}
+    });
+  });
+})();
+</script>
+
+</body></html>
